@@ -21,3 +21,7 @@ output "F5_UI" {
 output "Consul_UI" {
   value = "http://${aws_instance.consul.public_ip}:8500"
 }
+
+output "Consul_VPC_Ip" {
+  value = "http://${aws_instance.consul.private_ip}:8500"
+}

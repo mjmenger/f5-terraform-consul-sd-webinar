@@ -23,3 +23,5 @@ else
 fi
 
 # check for python3 
+
+export TF_VAR_allow_from="$(dig +short myip.opendns.com @resolver1.opendns.com.)/32"

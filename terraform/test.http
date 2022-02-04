@@ -1,0 +1,49 @@
+
+###
+GET http://{{$dotenv consul}}:8500/v1/catalog/service/nginx
+
+
+###
+POST https://{{$dotenv bigip}}:{{$dotenv bigipport}}/mgmt/shared/appsvcs/declare
+Authorization: Basic {{$dotenv bigipuser}} {{$dotenv bigippassword}}
+Content-Type: application/json
+
+{
+    "class": "ADC",
+    "schemaVersion": "3.7.0",
+    "id": "Consul_SD",
+        "controls": {
+        "class": "Controls",
+        "trace": true,
+        "logLevel": "debug"
+    },
+    "Consul_SD": {
+      "class": "Tenant",
+      "Nginx": {
+        "class": "Application",
+        "template": "http",
+        "serviceMain": {
+          "class": "Service_HTTP",
+          "virtualPort": 8080,
+          "virtualAddresses": [
+            "{{$dotenv bigipprivateip}}"
+          ],
+          "pool": "web_pool"
+        },
+        "web_pool": {
+          "class": "Pool",
+          "monitors": [
+            "http"
+          ],
+          "members": [
+            {
+              "servicePort": 80,
+              "addressDiscovery": "consul",
+              "updateInterval": 5,
+              "uri": "http://{{$dotenv consulprivateip}}:8500/v1/catalog/service/nginx"
+            }
+          ]
+        }
+      }
+    }
+}
